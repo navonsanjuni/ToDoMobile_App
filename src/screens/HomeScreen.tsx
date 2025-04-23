@@ -1,21 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
 
-  // Sample tasks
-  const [tasks, setTasks] = useState([
+  // State for tasks (initialize as an empty array)
+  const [tasks, setTasks] = useState([]);
 
-    { id: '1', title: 'Task 1', completed: true },
-    { id: '2', title: 'Task 2', completed: false },
-    { id: '3', title: 'Task 3', completed: true },
-    { id: '4', title: 'Task 4', completed: false },
-  ]);
-
+  // State for filter
   const [filter, setFilter] = useState<'all' | 'completed' | 'pending'>('all');
+
+  // Add the new task to the task list when navigating back from AddTaskScreen
+  useEffect(() => {
+    if (route.params?.newTask) {
+      setTasks((prevTasks) => [...prevTasks, route.params.newTask]);
+
+      // Clear the route.params to prevent re-adding the same task
+      navigation.setParams({ newTask: null });
+    }
+  }, [route.params?.newTask]);
 
   // Filter tasks based on the selected filter
   const filteredTasks = tasks.filter((task) => {
